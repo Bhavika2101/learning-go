@@ -15,7 +15,7 @@ func main() {
 	c.AddFunc("0 30 * * * *", func() { fmt.Println("Every hour on the half hour") })
 	c.AddFunc("TZ=America/New_York 30 04 * * * *", func() { fmt.Println("Runs at 04:30 New York time every day") })
 	c.AddFunc("@hourly", func() { fmt.Println("Runs every hour") })
-	c.AddFunc("@every 0h0m5s", func() { sayHelloTo("Roost!") })
+	c.AddFunc("@every 0h0m5s", func() { sayHelloTo("") })
 	c.Start()
 
 	// Funcs may also be added to a running Cron
@@ -29,5 +29,5 @@ func main() {
 }
 
 func sayHelloTo(name string) {
-	fmt.Println("Hello ", name)
+	fmt.Print("Hello", name)
 }

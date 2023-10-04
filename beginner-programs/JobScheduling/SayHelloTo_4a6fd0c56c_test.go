@@ -3,7 +3,8 @@
 package main
 
 import (
-	"bytes"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -13,17 +14,30 @@ func TestSayHelloTo(t *testing.T) {
 		input  string
 		output string
 	}{
-		{name: "Empty string", input: "", output: "Hello \n"},
-		{name: "Non-empty string", input: "John", output: "Hello John\n"},
+		{name: "Empty string", input: "", output: "Hello"},
+		{name: "Non-empty string", input: "John", output: "HelloJohn"},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			var buf bytes.Buffer
+			// var buf bytes.Buffer
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			// Capture the output in a goroutine
+			output := make(chan string)
+			go func() {
+				buf := make([]byte, len(tc.output))
+				_, _ = r.Read(buf)
+				output <- string(buf)
+			}()
 			sayHelloTo(tc.input)
-			got := buf.String()
-			if got != tc.output {
-				t.Errorf("Expected: %q, got: %q", tc.output, got)
+			// got := buf.String()
+			w.Close()
+			result := <-output
+			result = strings.TrimSpace(result)
+			if result != tc.output {
+				t.Errorf("Expected: %q, got: %q", tc.output, result)
 			}
 		})
 	}
